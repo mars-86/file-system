@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "file_manip.h"
+#include "file.h"
 
 struct _FILEBUF {
     FILE *fd;
@@ -10,7 +10,7 @@ struct _FILEBUF {
     size_t size;
 };
 
-void _file_get_mode(int mode, char *mode_str)
+static void _file_get_mode(int mode, char *mode_str)
 {
     switch (mode) {
     case FILE_MANIP_READ:
@@ -45,7 +45,7 @@ void _file_get_mode(int mode, char *mode_str)
     }
 }
 
-int _file_open_base(FILE **fd, const char *__restrict__ path, const char *__restrict__ mode)
+static int _file_open_base(FILE **__restrict fd, const char *__restrict path, const char *__restrict mode)
 {
 /*
 #ifdef _WIN32
@@ -61,7 +61,7 @@ int _file_open_base(FILE **fd, const char *__restrict__ path, const char *__rest
     return 0;
 }
 
-int file_read(const char *__restrict__ path, char *__restrict__ buff, size_t size)
+int file_read(const char *path, char *buff, size_t size)
 {
     FILE *fd;
     if (_file_open_base(&fd, path, "r") > 0)
@@ -76,7 +76,7 @@ int file_read(const char *__restrict__ path, char *__restrict__ buff, size_t siz
     return 0;
 }
 
-int file_write(const char *__restrict__ path, const char *__restrict__ content)
+int file_write(const char *path, const char *content)
 {
     FILE *fd;
     if (_file_open_base(&fd, path, "w") > 0)
@@ -88,14 +88,14 @@ int file_write(const char *__restrict__ path, const char *__restrict__ content)
     return 0;
 }
 
-int file_read_f(const char *__restrict__ path, char *__restrict__ buff, size_t size, const char *__restrict__ encoding)
+int file_read_f(const char *path, char *buff, size_t size, const char *encoding)
 {
     FILE *fd;
     _file_open_base(&fd, path, "r");
     return 0;
 }
 
-int file_write_f(const char *__restrict__ path, const char *__restrict__ content, const char *__restrict__ encoding)
+int file_write_f(const char *path, const char *content, const char *encoding)
 {
     FILE *fd;
     _file_open_base(&fd, path, "r");
@@ -175,11 +175,11 @@ const char file_type_fb(FILEBUF* fb)
     return fb->type;
 }
 
-size_t file_read_binary_(FILE *fd, unsigned char *fbuff, long buff_size)
+size_t file_read_binary_(FILE *fd, unsigned char *buff, long buff_size)
 {
     int i, c;
     for (i = 0; (c = fgetc(fd)) != EOF && i < buff_size; ++i)
-        *(fbuff + i) = (unsigned char)c;
+        *(buff + i) = (unsigned char)c;
     return i; // bytes read
 }
 
@@ -199,16 +199,21 @@ int file_create(const char *path, unsigned char *buff, size_t size)
     return 1;
 }
 
-int file_dup(const char *__restrict__ path_dest, const char *__restrict__ path_src)
+int file_copy(const char *_dest, const char *_src)
 {
     FILE *fs, *fd;
     int c;
-    if (file_open(&fs, path_src, FILE_MANIP_READ | FILE_MANIP_BINARY) > 0) return 1;
-    if (file_open(&fd, path_dest, FILE_MANIP_WRITE | FILE_MANIP_BINARY) > 0) return 1;
+    if (file_open(&fs, _src, FILE_MANIP_READ | FILE_MANIP_BINARY) > 0) return 1;
+    if (file_open(&fd, _dest, FILE_MANIP_WRITE | FILE_MANIP_BINARY) > 0) return 1;
     while ((c = fgetc(fs)) != EOF) fputc((unsigned char)c, fd);
     file_close(fd);
     file_close(fs);
     return 1;
+}
+
+int file_move(const char *_dest, const char *_src)
+{
+    return file_copy(_dest, _src);
 }
 
 int file_close(FILE *fd)
