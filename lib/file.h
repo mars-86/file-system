@@ -8,13 +8,13 @@ extern "C" {
 
 typedef struct _FILEBUF FILEBUF;
 
-typedef enum _FILE_MODES {
+typedef enum _FILE_MODE {
 	FILE_READ = 0x01,
 	FILE_WRITE = 0x02,
 	FILE_APPEND = 0x04,
 	FILE_PLUS = 0x08,
 	FILE_BINARY = 0x10
-} file_modes_t;
+} file_mode_t;
 
 extern int __cdecl file_read(const char *__restrict _path, char *__restrict _buff, size_t _size)
 	__MINGW_NOTHROW __MINGW_ATTRIB_NONNULL(1) __MINGW_ATTRIB_NONNULL(2);
@@ -22,10 +22,10 @@ extern int __cdecl file_read(const char *__restrict _path, char *__restrict _buf
 extern int __cdecl file_write(const char *__restrict _path, const char *__restrict _content)
 	__MINGW_NOTHROW __MINGW_ATTRIB_NONNULL(1) __MINGW_ATTRIB_NONNULL(2);
 
-extern int __cdecl file_open(FILE **__restrict _fd, const char *__restrict _path, int _mode)
+extern int __cdecl file_open(FILE **__restrict _fd, const char *__restrict _path, file_mode_t _mode)
 	__MINGW_NOTHROW __MINGW_ATTRIB_NONNULL(1) __MINGW_ATTRIB_NONNULL(2);
 
-extern int __cdecl file_open_fb(FILEBUF **__restrict _fb, const char *__restrict _path, int _mode)
+extern int __cdecl file_open_fb(FILEBUF **__restrict _fb, const char *__restrict _path, file_mode_t _mode)
 	__MINGW_NOTHROW __MINGW_ATTRIB_NONNULL(1) __MINGW_ATTRIB_NONNULL(2);
 
 extern int __cdecl is_file_open(FILE* _fd)
